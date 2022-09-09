@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
-LABEL org.opencontainers.image.source=https://github.com/drdrew42/renderer
-MAINTAINER drdrew42
+LABEL org.opencontainers.image.source='https://github.com/openwebwork/renderer'
+LABEL org.opencontainers.image.authors='The WeBWorK Project <thewebworkproject@gmail.com>'
 
 WORKDIR /usr/app
 ARG DEBIAN_FRONTEND=noninteractive
@@ -11,10 +11,8 @@ RUN apt-get update \
     apt-utils \
     git \
     gcc \
-    npm \
     make \
     curl \
-    nodejs \
     dvipng \
     openssl \
     libc-dev \
@@ -43,28 +41,36 @@ RUN apt-get update \
     libmath-random-secure-perl \
     libdata-structure-util-perl \
     liblocale-maketext-lexicon-perl \
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y --no-install-recommends --no-install-suggests nodejs \
     && apt-get clean \
     && rm -fr /var/lib/apt/lists/* /tmp/*
 
-RUN cpanm install Mojo::Base Statistics::R::IO::Rserve Date::Format Future::AsyncAwait Crypt::JWT IO::Socket::SSL CGI::Cookie \
+RUN cpanm install \
+    Mojo::Base \
+    Statistics::R::IO::Rserve \
+    Date::Format \
+    Future::AsyncAwait \
+    Crypt::JWT \
+    IO::Socket::SSL \
+    CGI::Cookie \
+    YAML::XS \
     && rm -fr ./cpanm /root/.cpanm /tmp/*
 
-ENV MOJO_MODE=production
-
 # Clones the OPL into the container. Should be the only difference from ./Dockerfile
-RUN curl -sOL "https://github.com/openwebwork/webwork-open-problem-library/archive/refs/heads/master.tar.gz"
-RUN tar -zxf master.tar.gz
+RUN curl -sOL "https://github.com/openwebwork/webwork-open-problem-library/archive/refs/heads/main.tar.gz"
+RUN tar -zxf main.tar.gz
 RUN mkdir webwork-open-problem-library
-RUN rm master.tar.gz
-RUN mv webwork-open-problem-library-master/OpenProblemLibrary/ webwork-open-problem-library/OpenProblemLibrary/
-RUN mv webwork-open-problem-library-master/Contrib/ webwork-open-problem-library/Contrib/
-RUN rm -r webwork-open-problem-library-master/
+RUN rm main.tar.gz
+RUN mv webwork-open-problem-library-main/OpenProblemLibrary/ webwork-open-problem-library/OpenProblemLibrary/
+RUN mv webwork-open-problem-library-main/Contrib/ webwork-open-problem-library/Contrib/
+RUN rm -r webwork-open-problem-library-main/
 
 COPY . .
 
-RUN cp render_app.conf.dist render_app.conf
+RUN npm install
 
-RUN cd lib/WeBWorK/htdocs && npm install && cd ../../..
+RUN cd lib/PG/htdocs && npm install && cd ../../..
 
 EXPOSE 3000
 

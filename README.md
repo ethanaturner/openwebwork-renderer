@@ -1,7 +1,7 @@
 # WeBWorK Standalone Problem Renderer & Editor
 
-![Commit Activity](https://img.shields.io/github/commit-activity/m/drdrew42/renderer?style=plastic)
-![License](https://img.shields.io/github/license/drdrew42/renderer?style=plastic)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/openwebwork/renderer?style=plastic)
+![License](https://img.shields.io/github/license/openwebwork/renderer?style=plastic)
 
 
 This is a PG Renderer derived from the WeBWorK2 codebase
@@ -13,7 +13,7 @@ This is a PG Renderer derived from the WeBWorK2 codebase
 mkdir volumes
 mkdir container
 git clone https://github.com/openwebwork/webwork-open-problem-library volumes/webwork-open-problem-library
-git clone --recursive https://github.com/drdrew42/renderer container/
+git clone --recursive https://github.com/openwebwork/renderer container/
 docker build --tag renderer:1.0 ./container
 
 docker run -d \
@@ -41,7 +41,7 @@ A default configuration file is included in the container, but it can be overrid
 
 If using a local install instead of docker:
 
-* Clone the renderer and its submodules: `git clone --recursive https://github.com/drdrew42/renderer`
+* Clone the renderer and its submodules: `git clone --recursive https://github.com/openwebwork/renderer`
 * Enter the project directory: `cd renderer`
 * Install perl dependencies listed in Dockerfile (CPANMinus recommended)
 * clone webwork-open-problem-library into the provided stub ./webwork-open-problem-library
