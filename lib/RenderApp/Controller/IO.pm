@@ -118,6 +118,68 @@ sub upload {
     return $c->render( text => 'File successfully uploaded', status => 200 );
 }
 
+sub remove {
+  my $c = shift;
+  my $required = [];
+  push @$required,
+    {
+      field     => 'removeFilePath',
+      checkType => 'like',
+      check     => $regex->{privateOnly},
+    };
+  my $validatedInput = $c->validateRequest( { required => $required } );
+  return unless $validatedInput;
+  
+  my $file_path = $validatedInput->{removeFilePath};
+  my $file = Mojo::File->new($file_path);
+
+  if ( !$file->stat ) {
+    return $c->render( text => 'Path does not exist', status => 404 );
+  }
+
+  if ( -d $file ) {
+    my $tree = $file->list({ dir => 1 });
+    my $num_children = $tree->size;
+    if ( $num_children > 0 ) {
+      return $c->render( text => 'Directory is not empty', status => 400 );
+    }
+
+    $file->remove_tree;
+  } else {
+    my $response = $file->remove;
+  }
+
+  return $c->render( text => 'Path deleted' );
+}
+
+sub listDir {
+  my $c = shift;
+  my $required = [];
+  push @$required,
+    {
+      field     => 'basePath',
+      checkType => 'like',
+      check     => ${regex}->{privateOnly},
+    };
+  my $validatedInput = $c->validateRequest( { required => $required } );
+  return unless $validatedInput;
+
+  my $file_path = $validatedInput->{basePath};
+  my $file = Mojo::File->new($file_path);
+
+  if ( !$file->stat ) {
+    return $c->render( text => 'Path does not exist', status => 404 );
+  }
+  if ( !(-d $file) ) {
+    return $c->render( text => 'Path is not a directory', status => 400 );
+  }
+
+  my $tree = $file->list({ dir => 1 });
+  my @files = $tree->map(sub { $_->basename })->to_array;
+
+  return $c->render( json => { files => @files } );
+}
+
 async sub catalog {
     my $c = shift;
     my $required = [];

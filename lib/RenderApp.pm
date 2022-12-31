@@ -106,6 +106,8 @@ sub startup {
 		$r->any('/render-api/cat')->to('IO#catalog');
 		$r->any('/render-api/find')->to('IO#search');
 		$r->post('/render-api/upload')->to('IO#upload');
+		$r->get('/render-api/list')->to('IO#listDir');
+		$r->delete('/render-api/remove')->to('IO#remove');
 		$r->post('/render-api/sma')->to('IO#findNewVersion');
 		$r->post('/render-api/unique')->to('IO#findUniqueSeeds');
 		$r->post('/render-api/tags')->to('IO#setTags');
